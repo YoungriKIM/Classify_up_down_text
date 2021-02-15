@@ -22,3 +22,4 @@
 +
 import nltk
 nltk.download('punkt')
+>>> punct : punctuation = 구두점, 구두법
