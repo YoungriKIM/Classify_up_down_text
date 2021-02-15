@@ -1,0 +1,24 @@
+# https://wikidocs.net/32829 참고
+
+다운 받을 것들
+
++ pip install gensim
+>>> Gensim is an open-source library for unsupervised topic modeling and natural language processing, using modern statistical machine learning
+>>> https://radimrehurek.com/gensim/
+
+
++ pip install nltk 
+>>> nltk : natural language toolkit
+
+
++ pip install konlpy
+>>> korea nlp python
+>>> https://konlpy-ko.readthedocs.io/ko/v0.4.3/
+
+
++ pip install -U pandas-profiling
+데이터에 대한 overview를 제공
+
++
+import nltk
+nltk.download('punkt')
