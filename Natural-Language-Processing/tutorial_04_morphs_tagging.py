@@ -9,6 +9,7 @@
 
 text = "열심히 코딩한 나 자신, 점심에는 마라샹궈를 먹어봐요."
 
+# ------------------------------------------------------------------------------------
 # Okt
 # 1) morphs : 형태소 추출
 # 2) pos : 품사 태깅(Part-of-speech tagging)
@@ -32,12 +33,14 @@ print(okt.pos(text))
 print(okt.nouns(text))
 # ['코딩', '나', '자신', '점심', '마라샹궈']
 
+# ------------------------------------------------------------------------------------
 # Kkma
 # 1) morphs : 형태소 추출
 # 2) pos : 품사 태깅(Part-of-speech tagging)
 # 3) nouns : 명사 추출
 
 # 형태소 추출
+# 꼬꼬마: http://kkma.snu.ac.kr/documents/?doc=postag
 from konlpy.tag import Kkma
 kkma = Kkma()
 print(kkma.morphs(text))
