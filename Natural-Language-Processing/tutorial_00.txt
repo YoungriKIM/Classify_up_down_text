@@ -49,3 +49,11 @@ pip install JPype1-1.1.2-cp38-cp38-win_amd64.whl
 +
 >>> import nltk
 >>> nltk.download('stopwords')
+
+
+-------
+.xls > .csv 로 변환하기 위해 필요한 것들
+pip install xlrd
+pip install openpyxl
+pip install pandas
+이미 다운되어있네~
