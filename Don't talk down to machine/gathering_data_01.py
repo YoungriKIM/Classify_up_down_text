@@ -1,3 +1,5 @@
+# 한 파일 샘플로 가져와서 기본적인 전처리하고 참고
+
 import numpy as np
 import pandas as pd
 import xlrd
