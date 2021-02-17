@@ -9,7 +9,7 @@ def pre_data(data):
     temp = temp.drop(['번호','뒷문맥','출전'],1)
     temp = temp.fillna('.')
     temp['검색어'] = temp['앞문맥'].str.cat(temp['검색어'].astype(str))
-    temp['앞문맥'] = 0
+    temp['앞문맥'] = 1
     return temp
 
 # up 데이터 한번에 모으기
