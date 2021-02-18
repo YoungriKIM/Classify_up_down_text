@@ -3,3 +3,5 @@
 
 # 정규 표현식 re(regular expression)
 
+# 한글만 가져오기
+train_data['document'] = train_data['document'].str.replace("[^ㄱ-ㅎㅏ-ㅣ가-힣 ]","")

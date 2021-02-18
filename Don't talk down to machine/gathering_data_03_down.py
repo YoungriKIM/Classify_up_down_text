@@ -26,11 +26,50 @@ down_data = pd.concat(df_test)
 # 열 이름 변경
 down_data.columns = ['label', 'data']
 
+# 중복값 몇개인지 확인
+print(len(down_data['label'].unique()))     # 1 > 라벨이 0으로 하나이니 ok
+print('data열의 중복값: ', int(len(down_data['data']) - int(len(down_data['data'].unique()))))      # 2330 > 
+# data열의 중복값:  97
+
+# 중복값 제거
+down_data.drop_duplicates(subset = ['data'], inplace = True)
+print('중복값 제거 후의 데이터 수: ', len(down_data))
+# 중복값 제거 후의 데이터 수:  2330
+
+
 # 한글 아닌 문자 제외
 down_data['data'] = down_data['data'].str.replace("[^ㄱ-ㅎㅏ-ㅣ가-힣 ]","")
 print('down_data.shape: ', down_data.shape)    # (2427, 2)
 print('down_data.tail:\n ', down_data.tail())
 
-# Null값 있는지 확인
-# 중복값 있는지 확인(유일한 값 개수 찾기)
-# 중복값 제거 후 샘플 수 확인
+
+# ------------------------------------------------------------
+# ------------------------------------------------------------
+
+# 다음 파일에서 up + down 하기 위해 저장해보자
+print(type(down_data))  # <class 'pandas.core.frame.DataFrame'>
+
+# ------ csv -------
+# 저장하기
+down_data.to_csv('../NLP/save/down_data_01.csv')
+# 읽어와서 확인
+csv_down_data = pd.read_csv('../NLP/save/down_data_01.csv', index_col=0)
+print('load한 반말 데이터: \n', csv_down_data[-5:])
+
+### 용량: 91KB
+
+
+
+
+'''
+# ------ pickle --------
+# 저장하기
+down_data.to_pickle('../NLP/save/down_data_02.pkl')
+# 읽어와서 확인
+pic_down_data = pd.read_pickle('../NLP/save/down_data_02.pkl')
+print('load한 반말 데이터: \n', pic_down_data[-5:])
+
+### 용량: 121KB
+
+# csv로 저장
+'''

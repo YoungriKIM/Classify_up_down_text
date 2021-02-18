@@ -26,10 +26,31 @@ up_data = pd.concat(df_test)
 # 열 이름 변경
 up_data.columns = ['label', 'data']
 
+# 중복값 몇개인지 확인
+print(len(up_data['label'].unique()))     # 1 > 라벨이 0으로 하나이니 ok
+print('data열의 중복값: ', int(len(up_data['data']) - int(len(up_data['data'].unique()))))      # 2330 > 
+# data열의 중복값:  93
+
+# 중복값 제거
+up_data.drop_duplicates(subset = ['data'], inplace = True)
+print('중복값 제거 후의 데이터 수: ', len(up_data))
+# 중복값 제거 후의 데이터 수:  1750
+
+
 # 한글 아닌 문자 제외
 up_data['data'] = up_data['data'].str.replace("[^ㄱ-ㅎㅏ-ㅣ가-힣 ]","")
 print('down_data.shape: ', up_data.shape)    # (1843, 2)
 print('down_data.tail:\n ', up_data.tail())
 
+# ------------------------------------------------------------
+# ------------------------------------------------------------
 
+# 다음 파일에서 up + down 하기 위해 저장해보자
+
+# ------ csv -------
+# 저장하기
+up_data.to_csv('../NLP/save/up_data_01.csv')
+# 읽어와서 확인
+csv_up_data = pd.read_csv('../NLP/save/up_data_01.csv', index_col=0)
+print('load한 존대말 데이터: \n', csv_up_data[-5:])
 
