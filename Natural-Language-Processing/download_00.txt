@@ -38,6 +38,7 @@ jdk window 64bit 다운
 c:/program_files/java
 https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html
 후에 환경변수 추가해야 함
+https://ohtanja.tistory.com/14
 
 +
 error: SystemError: java.nio.file.InvalidPathException: Illegal char <*> at index 55: C:\Users\Admin\anaconda3\Lib\site-packages\konlpy\java\*

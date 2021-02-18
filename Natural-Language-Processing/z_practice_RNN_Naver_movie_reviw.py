@@ -222,11 +222,11 @@ def below_threshold_len(max_len, nested_list):
     for s in nested_list:
         if(len(s) <= max_len):
             cnt = cnt + 1
-    print('전체 샘플 중 길이아 %s 이하 샘플의 비율: %s'%(max_len, (cnt/len(nested_list))*100))
+    print('전체 샘플 중 길이가 %s 이하 샘플의 비율: %s'%(max_len, (cnt/len(nested_list))*100))
 
 max_len = 30
 below_threshold_len(max_len, x_train)
-# 전체 샘플 중 길이아 30 이하 샘플의 비율: 94.08434621707697
+# 전체 샘플 중 길이가 30 이하 샘플의 비율: 94.08434621707697
 # 패딩 길이를 30으로 하면 94%의 샘플을 커버 할 수 있음
 
 # 패딩 적용
