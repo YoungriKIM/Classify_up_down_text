@@ -83,3 +83,26 @@ from tensorflow.keras.preprocessing.text import Tokenizer
 
 
 ### 인코딩하기 전에!!!!!! 길이를 몇으로 할지 정해야 하니까 네이버 149줄 참고
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
