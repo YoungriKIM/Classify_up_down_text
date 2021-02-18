@@ -169,3 +169,35 @@ print("전체 등장 빈도에서 희귀 단어 등장 빈도 비율:", (rare_fr
 # 단어 집합에서 희귀 단어의 비율: 55.62615711640877
 # 전체 등장 빈도에서 희귀 단어 등장 빈도 비율: 1.8717147610743852
 
+# 빈도수 3 미만인 단어 개수 제거
+# 하되 0번짜기 패딩 토큰과 OOV 토큰을 고려하여 +2 함
+vocab_size = total_cnt - rare_cnt + 2
+print('단어 집합의 크기: ', vocab_size)
+
+# 단어 집합의 크기 : 19417
+
+# 토크나이저 + 정수 인코딩
+tokenizer = Tokenizer(vocab_size, oov_token='OOV')
+tokenizer.fit_on_texts(x_train)
+x_train = tokenizer.texts_to_sequences(x_train)
+x_test = tokenizer.texts_to_sequences(x_test)
+
+# 인코딩 확인을 위해 샘플 출력
+print(x_train[:3])
+# [[51, 455, 17, 261, 660], [934, 458, 42, 603, 2, 215, 1449, 25, 962, 676, 20], [387, 2444, 1, 2315, 5671, 3, 223, 10]]
+
+# y도 train, test 분리
+y_train = np.array(train_data['label'])
+y_test = np.array(test_data['label'])
+
+# 빈도수가 낮아 삭제되어 빈샘플이 된 것들 제거문 정의(길이가 0인 것들 골라서 삭제)
+drop_train = [index for index, sentence in enumerate(x_train) if len(sentence) < 1]
+
+# 빈샘플 제거문 적용
+x_train = np.delete(x_train, drop_train, axis=0)
+y_train = np.delete(y_train, drop_train, axis=0)
+print('len of x_train: ',len(x_train))
+print('len of y_train: ',len(y_train))
+# len of x_train:  145377
+# len of y_train:  145377
+
