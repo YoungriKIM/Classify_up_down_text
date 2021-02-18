@@ -9,6 +9,8 @@ import urllib.request
 from konlpy.tag import Okt
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
+from konlpy.tag import Okt
+okt = Okt()
 
 # urllib 이용해 링크 넣어서 데이터 다운로드
 # urllib.request.urlretrieve("https://raw.githubusercontent.com/e9t/nsmc/master/ratings_train.txt", filename = 'ratings_train.txt')
@@ -143,7 +145,7 @@ tokenizer = Tokenizer()
 tokenizer.fit_on_texts(x_train)
 print('단어에 정수 부여 확인\n', tokenizer.word_index)
 
-
+# ------------------------------------------------------------
 # 등장 빈도수 3회 미만 단어의 비중 확인
 threshold = 3
 total_cnt = len(tokenizer.word_index)
@@ -176,6 +178,7 @@ print('단어 집합의 크기: ', vocab_size)
 
 # 단어 집합의 크기 : 19417
 
+# ------------------------------------------------------------
 # 토크나이저 + 정수 인코딩
 tokenizer = Tokenizer(vocab_size, oov_token='OOV')
 tokenizer.fit_on_texts(x_train)
@@ -201,3 +204,80 @@ print('len of y_train: ',len(y_train))
 # len of x_train:  145377
 # len of y_train:  145377
 
+# ------------------------------------------------------------
+# 패딩(서로 다른 길이의 샘플을 동일하게 맞추기)
+print('리뷰의 최대 길이: ', max(len(l) for l in x_train))
+print('리뷰의 평균 길이: ', sum(map(len, x_train))/len(x_train))
+plt.hist([len(s) for s in x_train], bins=50)
+plt.xlabel('lenth of samples')
+plt.ylabel('number of samples')
+# plt.show()
+# 리뷰의 최대 길이:  73
+# 리뷰의 평균 길이:  11.001664637459847
+
+# 그래프를 보니 패딩의 길이를 30으로 하면 대부분의 샘플을 커버할 수 있을 것 같다.
+# 확인 해보자!
+def below_threshold_len(max_len, nested_list):
+    cnt = 0
+    for s in nested_list:
+        if(len(s) <= max_len):
+            cnt = cnt + 1
+    print('전체 샘플 중 길이아 %s 이하 샘플의 비율: %s'%(max_len, (cnt/len(nested_list))*100))
+
+max_len = 30
+below_threshold_len(max_len, x_train)
+# 전체 샘플 중 길이아 30 이하 샘플의 비율: 94.08434621707697
+# 패딩 길이를 30으로 하면 94%의 샘플을 커버 할 수 있음
+
+# 패딩 적용
+x_train = pad_sequences(x_train, maxlen = max_len)
+x_test = pad_sequences(x_test, maxlen = max_len)
+
+# ------------------------------------------------------------
+# 모델 구성
+from tensorflow.keras.layers import Embedding, Dense, LSTM
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.models import load_model
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+
+# 임베딩 벡터 차원 100으로 정하고 lstm 이용
+model = Sequential()
+model.add(Embedding(vocab_size, 100))
+model.add(LSTM(128))
+model.add(Dense(1, activation='sigmoid'))
+
+# callbacks 정의
+stop = EarlyStopping(monitor='val_loss', mode = 'min', verbose=1, patience=8)
+file_path = '../data/modelcheckpoint/NLP/naver_movie.h5'
+mc = ModelCheckpoint(filepath= file_path, monitor='val_acc', mode = 'max', save_best_only=True, verbose=1)
+
+# 컴파일, 훈련
+model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['acc'])
+history = model.fit(x_train, y_train, epochs=15, batch_size=32, validation_split=0.2, callbacks=[stop, mc])
+
+# ------------------------------------------------------------
+# 정확도가 가장 높은 가중치 가져와서 적용
+loaded_model = load_model("../data/modelcheckpoint/NLP/naver_movie.h5")
+print('===== save complete =====')
+print('\n model.evaluate: %.4f' % (loaded_model.evaluate(x_test, y_test)[1]))
+#  model.evaluate: 0.8531
+
+# 전에 predict에 넣을 것도 전처리 똑같이 해줘야 겠지?
+def sentiment_predict(new_sentence):
+    # 전처리
+    new_sentence = okt.morphs(new_sentence, stem=True)  # 토큰화
+    new_sentence = [word for word in new_sentence if not word in stopwords] # 불용어 제거
+    encoded = tokenizer.texts_to_sequences([new_sentence])  # 정수 인코딩
+    pad_new = pad_sequences(encoded, maxlen = max_len)  # 패딩
+    # 예측
+    score = float(loaded_model.predict(pad_new))
+    if(score > 0.5):
+        print('{:.2f} % 확률로 긍정 리뷰입니다.\n'.format(score * 100))
+    else:
+        print('{:.2f} % 확률로 부정 리뷰입니다.\n'.format((1 - score) * 100))
+
+
+# =========================================================
+# 에측하기
+sentiment_predict('이 영화 개꿀잼ㅋㅋㅋㅋ')
+# 93.06 % 확률로 긍정 리뷰입니다.
