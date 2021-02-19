@@ -1,3 +1,7 @@
+# 불용어에서 종미어구 삭제하기
+# 이 부분은...다시...하....
+
+
 import numpy as np
 from konlpy.tag import Kkma
 kkma = Kkma()
@@ -8,7 +12,6 @@ text = f.read()
 
 morph = kkma.pos(text)
 # print(morph)
-
 
 
 drop_sample = ['EFN']
@@ -31,5 +34,3 @@ print(drop_sample)
 # morph = np.delete(morph, drop_sample)
 
 # print(morph)
-
-# 이 부분은...다시...하....
