@@ -27,7 +27,8 @@ max_len = 15
 # # ------------------------------------------------------------
 # 정확도가 가장 높은 가중치 가져와서 모델로 적용 
 from tensorflow.keras.models import load_model
-model = load_model('../NLP/modelcheckpoint/project_01.h5')
+file_path = '../NLP/modelcheckpoint/project_01.h5'
+model = load_model(filepath=file_path)
 print('===== load complete =====')
 
 # ------------------------------------------------------------
@@ -38,42 +39,45 @@ def do_predict(new_sentence):
     onlykorean = re.compile("[^ㄱ-ㅎㅏ-ㅣ가-힣]").sub(' ',new_sentence)   # 한글 아닌 문자 제외
     token = okt.morphs(onlykorean)     # 토큰화
     delstopword = [word for word in token if not word in stopword]  # 불용어 제거
-    encoded = tokenizer.texts_to_sequences([delstopword])   # 정수 인코딩
+    encoded = tokenizer.texts_to_sequences([token])   # 정수 인코딩
     padded = pad_sequences(encoded, maxlen = max_len, padding='pre')     # 패딩
 
     # 예측
     score = float(model.predict(padded))
     if(score > 0.5):
-        print(new_sentence, '는 {:.2f} % 확률로 존댓말입니다.\n'.format(score * 100))
+        print(new_sentence, '는 {:.2f} % 확률로 존댓말입니다.'.format(score * 100))
     else:
-        print(new_sentence, '는 {:.2f} % 확률로 반말입니다.\n'.format((1 - score) * 100))
+        print(new_sentence, '는 {:.2f} % 확률로 반말입니다.'.format((1 - score) * 100))
 
 # =============================================================
-do_predict('이미 시작한 일 되돌릴 수는 없어요~~~!')
-do_predict('만가서 반갑습니다 김영리에요.')
-do_predict('저희 같이 코딩 합시다')
-do_predict('존댓말에도 여러가지 종류가 있다는 걸 기억하십시오')
-do_predict('내가 이렇게 반말해도 넌 모르겠지')
-do_predict('이녀석 다 반말로 보이니ㅋㅋㅋㅋ')
-do_predict('잘하자^^')
-do_predict('슬슬 졸린데 이제 자러 갈까?')
-do_predict('근데 오빠 왜 안 자..?')
+do_predict('이렇게 말해')
+do_predict('이렇게 말하곤 해')
+do_predict('이렇게 말해볼까')
+do_predict('이렇게 말하니까')
+do_predict('이렇게 말하는거 어떠냐')
+do_predict('이렇게 말하는구나')
+do_predict('이렇게 말하지마')
+do_predict('이렇게 말하잖아')
+do_predict('이렇게 말하더라')
+do_predict('이렇게 말하잖니')
+do_predict('이렇게 말하네')
+do_predict('이렇게 말했어')
+do_predict('이렇게 말하자')
+print('-------------------------------')
+do_predict('이렇게 말해요')
+do_predict('이렇게 말했어요')
+do_predict('이렇게 말했다니까요')
+do_predict('이렇게 말했나요?')
+do_predict('이렇게 말하지요')
+do_predict('이렇게 말했잖아요')
+do_predict('이렇게 말해보세요')
+do_predict('이렇게 말한 거에요')
+do_predict('이렇게 말하지 마시오')
+do_predict('이렇게 말하죠')
+do_predict('이렇게 말했죠')
+do_predict('이렇게 말했습니다')
+do_predict('이렇게 말합시다')
 
 # =============================================================
-# 이미 시작한 일 되돌릴 수는 없어요~~~! 는 100.00 % 확률로 존댓말입니다.
-
-# 만가서 반갑습니다 김영리에요. 는 99.98 % 확률로 존댓말입니다.
-
-# 저희 같이 코딩 합시다 는 96.24 % 확률로 존댓말입니다.
-
-# 존댓말에도 여러가지 종류가 있다는 걸 기억하십시오 는 71.37 % 확률로 반말입니다.
-
-# 내가 이렇게 반말해도 넌 모르겠지 는 98.55 % 확률로 반말입니다.
-
-# 이녀석 다 반말로 보이니ㅋㅋㅋㅋ 는 78.23 % 확률로 반말입니다.
-
-# 잘하자^^ 는 100.00 % 확률로 반말입니다.
-
-# 슬슬 졸린데 이제 자러 갈까? 는 85.24 % 확률로 존댓말입니다.
-
-# 근데 오빠 왜 안 자..? 는 100.00 % 확률로 반말입니다.
+# 정리 중
+# https://docs.google.com/spreadsheets/d/17OxKDrjJH6KJs_J-Ng0AsvaZXp6svhGdKIjEbLP0Xhw/edit#gid=0

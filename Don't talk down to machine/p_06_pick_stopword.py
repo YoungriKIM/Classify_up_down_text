@@ -1,12 +1,7 @@
-# 전처리 어느정도 한 up과 down 데이터를 합해서 나머지 전처리를 하자
+# > 결과가 너무 안 좋음 맨 처음 파일 쓰기로
 
-# [진행 해서 온 전처리]
-# 1) 데이터셋에서 필요 없는 부분 버리기
-# 2) nan 값은 . 으로 변환
-# 3) 두 개의 열로 나눠진 문장 하나로 합치기
-# 4) 0과 1로 라벨링 부여하기
-# 5) 열 이름 label, data로 변경
-# 6) 정규식으로 한글 데이터만 남기기
+# p_01 에서 적용한 불용어 리스트에서 종미어구와 비슷한 키워드를 더 삭제함
+# stopword_02.txt > stopword_03.txt 으로 변경하여 진행하고 성능 비교
 
 # ------------------------------------------------------------
 import numpy as np
@@ -37,12 +32,11 @@ print('shape of all_data: ', all_data.shape)
 # profile_all_data.to_file('../NLP/sample_data/profile_all_data.html')
 # print('===== save complete =====')
 
-
 # ------------------------------------------------------------
 # 본격적인 전처리 시작
 
 # 불용어 불러오기(import_stopword.py 파일 참고)
-f = open('../NLP/sample_data/stopword_02.txt','rt',encoding='utf-8')  # Open file with 'UTF-8' 인코딩
+f = open('../NLP/sample_data/stopword_03.txt','rt',encoding='utf-8')  # Open file with 'UTF-8' 인코딩
 text = f.read()
 stopword = text.split('\n') 
 
@@ -56,7 +50,7 @@ tag_data = []
 for sentence in all_data['data']:
     temp_x = []
     temp_x = okt.morphs(sentence)
-    temp_x = [word for word in temp_x if not word in stopword]
+    # temp_x = [word for word in temp_x if not word in stopword]
     tag_data.append(temp_x)
 
 # 확인용 출력
@@ -77,38 +71,6 @@ print('토큰화 된 샘플: ', tag_data[-5:])
                 #['아무', '도', '안', '그래'],\
                 #['모든', '큐', '다', '그래']]
 
-# ------------------------------------------------------------
-''' > 이 부분은 데이터셋 더더 많이 모은 다음에 진행
-# 등장 빈도수 적은 단어 비중 확인
-
-# 정수 인코딩하여 단어에 정수 부여 확인
-from tensorflow.keras.preprocessing.text import Tokenizer
-
-# 정수 인코딩해서 넘기기
-tokenizer = Tokenizer()
-tokenizer.fit_on_texts(tag_data)
-# print('단어에 정수 부여 확인\n: ', tokenizer.word_index)
-# 확인 완류!
-
-# 등장 빈도수 30회 미만인 단어 비중 확인(40이라는 수는 profiling에서 확인)
-threshold = 2
-total_cnt = len(tokenizer.word_index)
-rare_cnt = 0
-total_freq = 0
-rare_freq = 0
-
-# 단어-빈도수 쌍을 key,value로 받기
-for key, value in tokenizer.word_counts.items():
-    total_freq = total_freq + value
-    if (value < threshold):
-        rare_cnt = rare_cnt + 1
-        rare_freq = rare_freq + value
-
-print('단어 집합(vocabulary)의 크기 :',total_cnt)
-print('등장 빈도가 %s번 이하인 희귀 단어의 수: %s'%(threshold - 1, rare_cnt))
-print("단어 집합에서 희귀 단어의 비율:", (rare_cnt / total_cnt)*100)
-print("전체 등장 빈도에서 희귀 단어 등장 빈도 비율:", (rare_freq / total_freq)*100)
-'''
 # ------------------------------------------------------------
 # 0번짜리 패딩과 OOV 토큰 고려하여 단어 집합의 크기에서 +2
 # 단어 집합(vocabulary)의 크기 : 4998
@@ -201,20 +163,28 @@ model.add(Dense(1, activation='sigmoid'))
 
 # callbacks 정의
 stop = EarlyStopping(monitor='val_loss', mode = 'min', verbose=1, patience=8)
-file_path = '../NLP/modelcheckpoint/project_01.h5'
+file_path = '../NLP/modelcheckpoint/project_06-2.hdf5'
 mc = ModelCheckpoint(filepath= file_path, monitor='val_acc', mode = 'max', save_best_only=True, verbose=1)
 
 # 컴파일, 훈련
 model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['acc'])
-# history = model.fit(x_train, y_train, epochs=15, batch_size=32, validation_split=0.2, callbacks=[stop, mc])
+history = model.fit(x_train, y_train, epochs=15, batch_size=32, validation_split=0.2, callbacks=[stop, mc])
 
 # ------------------------------------------------------------
 # 정확도가 가장 높은 가중치 가져와서 적용
-loaded_model = load_model('../NLP/modelcheckpoint/project_01.h5')
+loaded_model = load_model('../NLP/modelcheckpoint/project_06-2.hdf5')
 print('===== save complete =====')
 print('loss: %.4f' % (loaded_model.evaluate(x_test, y_test)[0]), '\nacc: %.4f' % (loaded_model.evaluate(x_test, y_test)[1]))
 
 # =====================================
-# p_01
+# p_01  > project_01.h5
 # loss: 0.1747
 # acc: 0.9265
+
+# p_06  # 불용어 조금 변경 > project_06.hdf5
+# loss: 0.1503
+# acc: 0.9277   
+
+# 06-2 불용어 제거 안 함
+# loss: 0.2306
+# acc: 0.9265       > 결과가 너무 안 좋음 맨 처음 파일 쓰기로
