@@ -101,18 +101,32 @@ print(len(y))       # 5700
 
 # ------------------------------------------------------------
 # 패딩(서로 다른 길이의 샘플을 동일하게 맞추기)
+print('문장의 최대 길이: ', max(len(l) for l in x))
+print('문장의 평균 길이: ', sum(map(len, x))/len(x))
 
+# 패딩 길이 몇으로 할지 그래프로 확인
+import matplotlib.pyplot as plt
+plt.hist([len(s) for s in x], bins = 50)
+plt.xlabel('lenth of samples')
+plt.ylabel('number of samples')
+# plt.show()
 
-#####
-# 패딩 왜 이 길이로 했는지 보여주려고~~~~
+# 그래프를 보니 패딩 길이를 20로 하면 대부분의 샘플 커버 할 수 있을 듯
+# 확인 해볼 함수 정의
+def below_threshold_len(max_len, nested_list):
+    cnt = 0
+    for s in nested_list:
+        if (len(s) <= max_len):
+            cnt = cnt +1
+    print('전체 샘플 중 길이가 %s 이하인 샘플 비율: %s' % (max_len, (cnt/len(nested_list))*100))
 
-
-
-
-
-
-# 길이 20으로 정해서 함수 돌리기
+# 길이 정해서 함수 돌리기
 max_len = 20
+below_threshold_len(max_len, x)
+
+
+
+'''
 
 # 패딩 적용
 from tensorflow.keras.preprocessing.sequence import pad_sequences
@@ -219,3 +233,6 @@ do_predict('이렇게 말하죠')
 do_predict('이렇게 말했죠')
 do_predict('이렇게 말했습니다')
 do_predict('이렇게 말합시다')
+
+
+'''
