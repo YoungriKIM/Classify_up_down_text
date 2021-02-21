@@ -104,8 +104,11 @@ print(len(y))       # 5700
 # 패딩(서로 다른 길이의 샘플을 동일하게 맞추기)
 print('문장의 최대 길이: ', max(len(l) for l in x))
 print('문장의 평균 길이: ', sum(map(len, x))/len(x))
+<<<<<<< HEAD
 # 문장의 최대 길이:  65
 # 문장의 평균 길이:  6.606140350877193
+=======
+>>>>>>> 59c61bc4579adc63fc35da08bfdfb5993eece86f
 
 # 패딩 길이 몇으로 할지 그래프로 확인
 import matplotlib.pyplot as plt
@@ -126,7 +129,14 @@ def below_threshold_len(max_len, nested_list):
 # 길이 정해서 함수 돌리기
 max_len = 20
 below_threshold_len(max_len, x)
+<<<<<<< HEAD
 # 전체 샘플 중 길이가 20 이하인 샘플 비율: 98.57894736842105
+=======
+
+
+
+'''
+>>>>>>> 59c61bc4579adc63fc35da08bfdfb5993eece86f
 
 # 패딩 적용
 from tensorflow.keras.preprocessing.sequence import pad_sequences
@@ -238,3 +248,8 @@ do_predict('이렇게 말했죠')
 do_predict('이렇게 말했습니다')
 do_predict('이렇게 말합시다')
 
+<<<<<<< HEAD
+=======
+
+'''
+>>>>>>> 59c61bc4579adc63fc35da08bfdfb5993eece86f
