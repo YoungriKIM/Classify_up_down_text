@@ -84,6 +84,15 @@ from tensorflow.keras.preprocessing.text import Tokenizer
 tokenizer = Tokenizer()
 tokenizer.fit_on_texts(tag_data)
 print('단어에 정수 부여 확인\n', tokenizer.word_index)
+# 단어에 정수 부여 확인
+# {'어': 1, '아': 2, '가': 3, '는': 4, '았': 5, '었': 6, '어요': 7, '되': 8, \
+#  ··· '컨닝할': 1388, '집어넣': 1389, '자르': 1390, '쭐이면은': 1391}
+
+# tokenizer.word_counts.items()결과가 어떻게 나오는지 확인
+count_item = tokenizer.word_counts.items()
+# print('count_item: ', count_item)
+# odict_items([('고', 395), ('런', 2), ('거', 345), ('방송', 9),\
+#              ··· ('날짜', 1), ('는', 836), ('며칠', 7), ('며', 5)]
 
 # 등장 빈도수 1회인 단어의 비중 확인
 threshold = 2                           # 횟수 제한을 위한 수 지정
@@ -91,12 +100,6 @@ total_cnt = len(tokenizer.word_index)   # 전체 단어 집합의 개수
 rare_cnt = 0                            # 빈도수가 1회인 단어의 개수
 total_freq = 0                          # 전체 등장 빈도 여기서는 1205번
 rare_freq = 0                           # 빈도수가 1회인 단어의 빈도
-
-# tokenizer.word_counts.items()결과가 어떻게 나오는지 확인
-count_item = tokenizer.word_counts.items()
-# print('count_item: ', count_item)
-# odict_items([('고', 395), ('런', 2), ('거', 345), ('방송', 9), \
-#              ('날짜', 1), ('는', 836), ('며칠', 7), ('며', 5),
 
 # 단어-빈도수의 쌍을 key와 value로 받는다.
 for key, value in tokenizer.word_counts.items():
@@ -116,11 +119,11 @@ print('전체 등장 빈도에서 rare 단어 등장 빈도율:', (rare_freq / t
 # 단어 집합에서 rare 단어의 비율: 43.56578001437815
 # 전체 등장 빈도에서 rare 단어 등장 빈도율: 2.192078133478025
 
-# 빈도수 3 미만인 단어 개수 제거
-# 하되 0번짜기 패딩 토큰과 OOV 토큰을 고려하여 +2 함
+# 빈도수 1 이하인 단어 개수 제거하여 vocab_size 지정
+# 하되 0번짜리 패딩 토큰과 OOV 토큰을 고려하여 +2 함
 vocab_size = total_cnt - rare_cnt + 2
 print('빈도수1인 단어를 삭제한 전체 단어 집합의 개수: ', vocab_size)
-# 빈도수1인 단어를 삭제한 전체 단어 집합의 개수:  787
+# 빈도수1인 단어를 삭제한 전체 단어 +2를 한 집합의 개수:  787
 
 # ------------------------------------------------------------
 # 정수 인코딩
@@ -128,7 +131,7 @@ from tensorflow.keras.preprocessing.text import Tokenizer
 tokenizer = Tokenizer()
 
 # 인코딩 적용
-tokenizer = Tokenizer(vocab_size, oov_token='OOV')
+tokenizer = Tokenizer(vocab_size, oov_token='OOV')  # OOV : Out-Of-Vocabulary 
 tokenizer.fit_on_texts(tag_data)
 tag_data = tokenizer.texts_to_sequences(tag_data)
 
@@ -182,7 +185,8 @@ print(x[0])
 # ------------------------------------------------------------
 # train, test 나누기
 from sklearn.model_selection import train_test_split
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, shuffle=True, random_state=1)
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, \
+                                    shuffle=True, random_state=1)
 # 확인
 print(x_train.shape)
 print(y_train.shape)
@@ -201,9 +205,10 @@ from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 
 # 임베딩 벡터 차원 100으로 정하고 lstm 이용
 model = Sequential()
-model.add(Embedding(vocab_size, 100))
+model.add(Embedding(vocab_size, input_length=18, output_dim=100))
 model.add(LSTM(128))
 model.add(Dense(1, activation='sigmoid'))
+model.summary()
 
 # callbacks 정의
 stop = EarlyStopping(monitor='val_loss', mode = 'min', verbose=1, patience=8)
@@ -212,13 +217,15 @@ mc = ModelCheckpoint(filepath= file_path, monitor='val_acc', mode = 'max', save_
 
 # 컴파일, 훈련
 model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['acc'])
-history = model.fit(x_train, y_train, epochs=15, batch_size=32, validation_split=0.2, callbacks=[stop, mc])
+# history = model.fit(x_train, y_train, epochs=15, batch_size=32, validation_split=0.2, callbacks=[stop, mc])
 
 # ------------------------------------------------------------
 # 정확도가 가장 높은 가중치 가져와서 적용
 loaded_model = load_model('../NLP/modelcheckpoint/project_010.h5')
 print('===== save complete =====')
 print('loss: %.4f' % (loaded_model.evaluate(x_test, y_test)[0]), '\nacc: %.4f' % (loaded_model.evaluate(x_test, y_test)[1]))
+# loss: 0.0243
+# acc: 0.9939
 
 # ------------------------------------------------------------
 # 전에 predict에 넣을 것도 전처리 똑같이 해줘야 겠지?
@@ -243,24 +250,6 @@ def do_predict(new_sentence):
 # =========================================================
 # 예측하기
 
-# project_08-3  > kkma
-# loss: 0.0330
-# acc: 0.9886
-
-# project_08-4 > komoran    # 코모란으로 품사태깅 변경
-# loss: 0.0243
-# acc: 0.9939
-# kkma 보다 komoran이 더 정확. # 기준파일로 자정
-
-# project_09        # 빈도수 1짜리 삭제
-# loss: 0.0318
-# acc: 0.9895
-
-# project_010       # 명사 삭제
-# loss: 0.0504
-# acc: 0.9868
-
-# =========================================================
 do_predict('이렇게 말해')
 do_predict('이렇게 말하곤 해')
 do_predict('이렇게 말해볼까')
@@ -290,4 +279,4 @@ do_predict('이렇게 말했죠')
 do_predict('이렇게 말했습니다')
 do_predict('이렇게 말합시다')
 
-# 이 파일로 마무리!
+# 마무리

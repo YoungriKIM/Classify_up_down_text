@@ -7,11 +7,10 @@ import numpy as np
 import pandas as pd
 import re
 
-
 # 전처리에 쓸 pre_data 정의
 def pre_data(data):
     temp = data.copy()
-    temp = temp.drop(['번호','뒷문맥','출전'],1)    # 필요없는 거 떨구고
+    temp = temp.drop(['번호','뒷문맥','출전'], axis = 1)    # 필요없는 열 버리고
     temp = temp.fillna('.')     # nan 값 . 으로
     temp['검색어'] = temp['앞문맥'].str.cat(temp['검색어'].astype(str))     # 한 문장으로 합병
     temp['앞문맥'] = 0      # 라벨링 0으로(반말)
@@ -42,9 +41,17 @@ print('중복값 제거 후의 데이터 수: ', len(down_data))
 # 한글 아닌 문자 제외
 down_data['data'] = down_data['data'].str.replace("[^ㄱ-ㅎㅏ-ㅣ가-힣 ]","")
 print('down_data.shape: ', down_data.shape)    # (2870, 2)
-print('down_data.tail:\n ', down_data.tail())
+print('down_data.tail:\n ', down_data.head())
+
+#      label                                  data
+# 0      0  옛날에 그 연극과 신원이가 우리 과 듣다가 좌절한 얘기 못 들었나
+# 1      0                               몇 개 들었나
+# 2      0                       나 고전문학사 저번에 들었나
+# 3      0                               왜 안 들었나
+# 4      0                               다 안 들었나
 
 
+'''
 # ------------------------------------------------------------
 # ------------------------------------------------------------
 
@@ -60,3 +67,5 @@ print('load한 반말 데이터: \n', csv_down_data[-5:])
 
 ### 용량: 110KB
 
+
+'''
