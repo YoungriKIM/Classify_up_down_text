@@ -1,5 +1,4 @@
-# p_08 기준으로 빈도수 작은 것 삭제해서 비교
-
+# p_09파일에 이어서 이번에는 명사를 삭제하고 돌려보기로 함
 
 # ------------------------------------------------------------
 import numpy as np
@@ -52,10 +51,12 @@ for sentence in all_data['data']:
     temp_x = []
     temp_x = komo.morphs(sentence)
     temp_x = [word for word in temp_x if not word in stopword]
+    nounlist = komo.nouns(sentence)
+    temp_x = [noun for noun in temp_x if not noun in nounlist]
     tag_data.append(temp_x)
 
 # 확인용 출력
-# print('토큰화 된 샘플: ', tag_data[-10:-5])
+print('토큰화 된 샘플: ', tag_data[-10:-5])
 
 ### 불용어 제거 , 토큰화 전 ###
 #      label                        data
@@ -66,11 +67,12 @@ for sentence in all_data['data']:
 # 42      0          선훈이 오빠가 여동생 있다 그랬나
 
 ### 불용어 제거 , 토큰화 후 ###
-# 토큰화 된 샘플:  [['비', '비', '가', '있다', '그리하', '였', '나'], 
-                # ['내', '친구', '는', '뭐', '컴', '활', '이렇', 'ㄴ', '더', '어렵', '다고', '그리하', '였', '나'], 
-                # ['실추', '라고', '뭐', '그리하', '였', '나'], 
-                # ['그리하', '였', '나'], 
-                # ['선훈', '오빠', '가', '여동생', '있다', '그리하', '였', '나']]
+# 토큰화 된 샘플:  [['가', '있', '다', '그렇', '었', '나'], \
+                # ['내', '는', '뭐', '화', 'ㄹ', '더', '어렵', '다고', '그렇', '었', '나'], \
+                # ['라고', '뭐', '그렇', '었', '나'], \
+                # ['그렇', '었', '나'], \
+                # ['서', 'ㄴ', '가', '있', '다', '그렇', '었', '나']]
+
 
 # ------------------------------------------------------------
 # ------------------------------------------------------------
@@ -81,8 +83,7 @@ for sentence in all_data['data']:
 from tensorflow.keras.preprocessing.text import Tokenizer
 tokenizer = Tokenizer()
 tokenizer.fit_on_texts(tag_data)
-# print('단어에 정수 부여 확인\n', tokenizer.word_index)
-#  {'어': 1, '아': 2, '가': 3, '는': 4, '았': 5, '게': 6, '었': 7, ··· '미래': 1202, '액터': 1203, '삐': 1204, 'ㄴ다구': 1205}
+print('단어에 정수 부여 확인\n', tokenizer.word_index)
 
 # 등장 빈도수 1회인 단어의 비중 확인
 threshold = 2                           # 횟수 제한을 위한 수 지정
@@ -110,22 +111,16 @@ print('전체 단어 집합의 개수 :',total_cnt)
 print('빈도수가 %s번 이하인 rare 단어의 개수: %s'%(threshold - 1, rare_cnt))
 print('단어 집합에서 rare 단어의 비율:', (rare_cnt / total_cnt)*100)
 print('전체 등장 빈도에서 rare 단어 등장 빈도율:', (rare_freq / total_freq)*100)
-# 전체 단어 집합의 개수 : 4344
-# 빈도수가 1번 이하인 rare 단어의 개수: 2369
-# 단어 집합에서 rare 단어의 비율: 54.53499079189687
-# 전체 등장 빈도에서 rare 단어 등장 빈도율: 6.358878002952624
+# 전체 단어 집합의 개수 : 1391
+# 빈도수가 1번 이하인 rare 단어의 개수: 606
+# 단어 집합에서 rare 단어의 비율: 43.56578001437815
+# 전체 등장 빈도에서 rare 단어 등장 빈도율: 2.192078133478025
 
 # 빈도수 3 미만인 단어 개수 제거
 # 하되 0번짜기 패딩 토큰과 OOV 토큰을 고려하여 +2 함
 vocab_size = total_cnt - rare_cnt + 2
 print('빈도수1인 단어를 삭제한 전체 단어 집합의 개수: ', vocab_size)
-# 빈도수1인 단어를 삭제한 전체 단어 집합의 개수:  1977
-
-'''
-# 0번짜리 패딩과 OOV 토큰 고려하여 단어 집합의 크기에서 +2
-# 단어 집합(vocabulary)의 크기 : 5702
-vocab_size = 5702
-'''
+# 빈도수1인 단어를 삭제한 전체 단어 집합의 개수:  787
 
 # ------------------------------------------------------------
 # 정수 인코딩
@@ -139,8 +134,7 @@ tag_data = tokenizer.texts_to_sequences(tag_data)
 
 # 인코딩 확인을 위해 샘플 출력
 print(tag_data[:3])
-# [[19, 1261, 23, 374, 1, 5, 477, 627, 19, 1261, 7, 11, 7, 59], \
-# [3, 1262, 1263, 478, 12, 180, 108, 59], [53, 13, 1, 5, 23, 59]]
+# [[19, 5, 356, 19, 11, 53], [3, 13, 134, 53], [49, 12, 1, 5, 53]]
 
 # ------------------------------------------------------------
 # x, y 로 지정해서 진행
@@ -154,17 +148,17 @@ print(len(y))       # 5700
 # 패딩(서로 다른 길이의 샘플을 동일하게 맞추기)
 print('문장의 최대 길이: ', max(len(l) for l in x))
 print('문장의 평균 길이: ', sum(map(len, x))/len(x))
-# 문장의 최대 길이:  62
-# 문장의 평균 길이:  6.5359649122807015
+# 문장의 최대 길이:  48
+# 문장의 평균 길이:  4.85
 
 # 패딩 길이 몇으로 할지 그래프로 확인
 import matplotlib.pyplot as plt
 plt.hist([len(s) for s in x], bins = 50)
 plt.xlabel('lenth of samples')
 plt.ylabel('number of samples')
-# plt.show()
+plt.show()
 
-# 그래프를 보니 패딩 길이를 20로 하면 대부분의 샘플 커버 할 수 있을 듯
+# 그래프를 보니 패딩 길이를 18로 하면 대부분의 샘플 커버 할 수 있을 듯
 # 확인 해볼 함수 정의
 def below_threshold_len(max_len, nested_list):
     cnt = 0
@@ -213,7 +207,7 @@ model.add(Dense(1, activation='sigmoid'))
 
 # callbacks 정의
 stop = EarlyStopping(monitor='val_loss', mode = 'min', verbose=1, patience=8)
-file_path = '../NLP/modelcheckpoint/project_09.h5'
+file_path = '../NLP/modelcheckpoint/project_010.h5'
 mc = ModelCheckpoint(filepath= file_path, monitor='val_acc', mode = 'max', save_best_only=True, verbose=1)
 
 # 컴파일, 훈련
@@ -222,7 +216,7 @@ history = model.fit(x_train, y_train, epochs=15, batch_size=32, validation_split
 
 # ------------------------------------------------------------
 # 정확도가 가장 높은 가중치 가져와서 적용
-loaded_model = load_model('../NLP/modelcheckpoint/project_09.h5')
+loaded_model = load_model('../NLP/modelcheckpoint/project_010.h5')
 print('===== save complete =====')
 print('loss: %.4f' % (loaded_model.evaluate(x_test, y_test)[0]), '\nacc: %.4f' % (loaded_model.evaluate(x_test, y_test)[1]))
 
@@ -253,14 +247,18 @@ def do_predict(new_sentence):
 # loss: 0.0330
 # acc: 0.9886
 
-# project_08-4 > komoran
+# project_08-4 > komoran    # 코모란으로 품사태깅 변경
 # loss: 0.0243
 # acc: 0.9939
 # kkma 보다 komoran이 더 정확. # 기준파일로 자정
 
-# project_09
+# project_09        # 빈도수 1짜리 삭제
 # loss: 0.0318
 # acc: 0.9895
+
+# project_010       # 명사 삭제
+# loss: 0.0504
+# acc: 0.9868
 
 # =========================================================
 do_predict('이렇게 말해')
@@ -292,4 +290,4 @@ do_predict('이렇게 말했죠')
 do_predict('이렇게 말했습니다')
 do_predict('이렇게 말합시다')
 
-
+# 이 파일로 마무리!

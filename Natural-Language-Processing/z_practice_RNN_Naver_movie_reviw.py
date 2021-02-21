@@ -181,7 +181,7 @@ print('단어 집합의 크기: ', vocab_size)
 # ------------------------------------------------------------
 # 토크나이저 + 정수 인코딩
 tokenizer = Tokenizer(vocab_size, oov_token='OOV')
-tokenizer.fit_on_texts(x_train)
+# tokenizer.fit_on_texts(x_train)
 x_train = tokenizer.texts_to_sequences(x_train)
 x_test = tokenizer.texts_to_sequences(x_test)
 
