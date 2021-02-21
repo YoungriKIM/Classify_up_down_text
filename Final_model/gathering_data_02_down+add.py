@@ -1,7 +1,4 @@
-# 데이터셋 부족하다고 판단, 더 모아서 csv로 저장 함
-# 저장 완료
-# csv_down_data = pd.read_csv('../NLP/save/down_data_02.csv', index_col=0)
-
+# 반말 데이터 모으고 간단한 전처리를 위한 파일
 
 import numpy as np
 import pandas as pd

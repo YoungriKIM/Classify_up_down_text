@@ -1,6 +1,5 @@
 # 존댓말 데이터 모으고 간단한 전처리를 위한 파일
 
-
 import numpy as np
 import pandas as pd
 import re
