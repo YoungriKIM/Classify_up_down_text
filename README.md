@@ -28,3 +28,4 @@
 >> predict.py : MC 후 예측만 돌리기
 
 ---
+Notion: https://www.notion.so/yugyomachine/9e90ce15f2514f328cc1eda7beaefaa5?v=00939d42013b400ea069c58b652d8d7d
