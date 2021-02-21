@@ -2,7 +2,8 @@
 
 ### Personal Project
 
-주제: 존대말, 반말 구분 분류 모델
+주제: 존대말, 반말 구분 분류 인공지능
+### NLP / RNN
 
 ---
 
@@ -26,3 +27,5 @@
 >> YUGYO_final_model.py : 최종 완성
 >> 
 >> predict.py : MC 후 예측만 돌리기
+
+---
