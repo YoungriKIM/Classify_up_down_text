@@ -1,5 +1,4 @@
-# 부족했던 데이터 추가하여 진행!
-# + kkma vs komoran 비교 하는 ㅣ것 까지! 
+# p_08 기준으로 빈도수 작은 것 삭제해서 비교
 
 
 # ------------------------------------------------------------
@@ -74,6 +73,44 @@ for sentence in all_data['data']:
                 # ['선훈', '오빠', '가', '여동생', '있다', '그리하', '였', '나']]
 
 # ------------------------------------------------------------
+# ------------------------------------------------------------
+# p_09 에서 추가한 부분
+
+# 등장 빈도수 확인을 위해 그래프 그리기
+
+# # 정수 인코딩해서 넘기기
+from tensorflow.keras.preprocessing.text import Tokenizer
+tokenizer = Tokenizer()
+lemon = tokenizer.fit_on_texts(tag_data)
+apple = pd.DataFrame(tokenizer.word_index.values())
+# print('단어에 부여된 정수 확인\n: ', tokenizer.word_index)
+# 어에 부여된 정수 확인
+# :  {'어': 1, '아': 2, '가': 3, '는': 4, '았': 5, '게': 6, '었': 7, '되': 8, '어요': 9, '있': 10, '시': 11,
+
+import pandas_profiling
+
+aaa = apple.profile_report()
+aaa.to_file('../NLP/sample_data/profile_all_data_p_shit.html')
+print('===== save complete =====')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'''
 # 0번짜리 패딩과 OOV 토큰 고려하여 단어 집합의 크기에서 +2
 # 단어 집합(vocabulary)의 크기 : 5702
 vocab_size = 5702
@@ -163,7 +200,7 @@ model.add(Dense(1, activation='sigmoid'))
 
 # callbacks 정의
 stop = EarlyStopping(monitor='val_loss', mode = 'min', verbose=1, patience=8)
-file_path = '../NLP/modelcheckpoint/project_08-4.h5'
+file_path = '../NLP/modelcheckpoint/project_09.h5'
 mc = ModelCheckpoint(filepath= file_path, monitor='val_acc', mode = 'max', save_best_only=True, verbose=1)
 
 # 컴파일, 훈련
@@ -172,7 +209,7 @@ history = model.fit(x_train, y_train, epochs=15, batch_size=32, validation_split
 
 # ------------------------------------------------------------
 # 정확도가 가장 높은 가중치 가져와서 적용
-loaded_model = load_model('../NLP/modelcheckpoint/project_08-4.h5')
+loaded_model = load_model('../NLP/modelcheckpoint/project_09.h5')
 print('===== save complete =====')
 print('loss: %.4f' % (loaded_model.evaluate(x_test, y_test)[0]), '\nacc: %.4f' % (loaded_model.evaluate(x_test, y_test)[1]))
 
@@ -238,3 +275,5 @@ do_predict('이렇게 말했죠')
 do_predict('이렇게 말했습니다')
 do_predict('이렇게 말합시다')
 
+
+'''

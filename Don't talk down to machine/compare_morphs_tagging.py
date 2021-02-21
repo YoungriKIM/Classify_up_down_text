@@ -16,7 +16,7 @@ komo = Komoran()
 
 def tagging(text):
     onlykorean = re.compile("[^ㄱ-ㅎㅏ-ㅣ가-힣]").sub(' ',text)   # 한글 아닌 문자 제외
-    token = okt.morphs(onlykorean)
+    token = komo.morphs(onlykorean)
     print(text,'\n',token)
 
 # ---------------------------------------------------------
@@ -30,3 +30,9 @@ tagging('이럴때 배가 고프지요.')
 tagging('이럴때 배가 고프죠.')
 tagging('저는 배가 고파요.')
 tagging('어서 점심을 시키세요.')
+
+
+
+
+
+

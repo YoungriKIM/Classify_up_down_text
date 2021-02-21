@@ -90,7 +90,7 @@ tokenizer.fit_on_texts(tag_data)
 # print('단어에 정수 부여 확인\n: ', tokenizer.word_index)
 # 확인 완류!
 
-# 등장 빈도수 30회 미만인 단어 비중 확인(40이라는 수는 profiling에서 확인)
+# 등장 빈도수 2회 미만인 단어 비중 확인(2이라는 수는 profiling에서 확인)
 threshold = 2
 total_cnt = len(tokenizer.word_index)
 rare_cnt = 0
