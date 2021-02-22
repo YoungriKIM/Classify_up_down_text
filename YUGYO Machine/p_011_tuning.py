@@ -150,7 +150,7 @@ from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLRO
 
 # 임베딩 벡터 차원 100으로 정하고 lstm 이용
 model = Sequential()
-model.add(Embedding(vocab_size, input_length=18, output_dim=100))
+model.add(Embedding(vocab_size, input_length=18, output_dim=32))
 model.add(LSTM(128))
 model.add(Dense(64))
 model.add(Dense(1, activation='sigmoid'))

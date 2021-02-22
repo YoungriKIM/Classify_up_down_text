@@ -13,7 +13,7 @@ vocab_size = 572
 
 model = Sequential()
 model.add(Embedding(vocab_size, input_length=18, output_dim=100))
-model.add(GlobalAveragePooling1D())
-# model.add(Flatten())
-model.add(Dense(64), activation='relu')
+model.add(LSTM(128, activation='relu'))
+model.add(Dense(64))
 model.add(Dense(1, activation='sigmoid'))
+model.summary()
