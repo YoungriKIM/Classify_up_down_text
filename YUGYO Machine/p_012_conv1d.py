@@ -1,5 +1,4 @@
-# 최종 튜닝
-# 패딩을 pre/ post 해서 conv1d 로 돌려보자 
+# 패딩 pred 아니라 post로 넣어서 conv1로 돌려서 비교+써머리
 
 # ------------------------------------------------------------
 import numpy as np
@@ -21,6 +20,15 @@ print('존댓말 데이터의 수: ', len(up_data), '\n반말 데이터의 수: 
 all_data = pd.concat([up_data, down_data])
 print('shape of all_data: ', all_data.shape)
 # shape of all_data:  (5700, 2)
+
+# ------------------------------------------------------------
+# 전처리 전에 pandas_profiling 으로 데이터 분석
+# import pandas_profiling
+
+# profile_all_data = all_data.profile_report()
+# profile_all_data.to_file('../NLP/sample_data/profile_all_data_p_08.html')
+# print('===== save complete =====')
+
 
 # ------------------------------------------------------------
 # 본격적인 전처리 시작
@@ -75,7 +83,7 @@ print('토큰화 된 샘플: ', tag_data[-10:-5])
 from tensorflow.keras.preprocessing.text import Tokenizer
 tokenizer = Tokenizer()
 tokenizer.fit_on_texts(tag_data)
-print('단어에 정수 부여 확인\n', tokenizer.word_index)
+# print('단어에 정수 부여 확인\n', tokenizer.word_index)
 # 단어에 정수 부여 확인
 # {'어': 1, '아': 2, '가': 3, '는': 4, '았': 5, '었': 6, '어요': 7, '되': 8, \
 #  ··· '컨닝할': 1388, '집어넣': 1389, '자르': 1390, '쭐이면은': 1391}
@@ -151,7 +159,7 @@ import matplotlib.pyplot as plt
 plt.hist([len(s) for s in x], bins = 50)
 plt.xlabel('lenth of samples')
 plt.ylabel('number of samples')
-plt.show()
+# plt.show()
 
 # 그래프를 보니 패딩 길이를 18로 하면 대부분의 샘플 커버 할 수 있을 듯
 # 확인 해볼 함수 정의
@@ -165,14 +173,15 @@ def below_threshold_len(max_len, nested_list):
 # 길이 정해서 함수 돌리기
 max_len = 18
 below_threshold_len(max_len, x)
-# 전체 샘플 중 길이가 18 이하인 샘플 비율: 98.0701754385965
+# 전체 샘플 중 길이가 18 이하인 샘플 비율: 99.52631578947368
 
 # 패딩 적용
 from tensorflow.keras.preprocessing.sequence import pad_sequences
-x = pad_sequences(x, maxlen = max_len, padding='pre') 
+x = pad_sequences(x, maxlen = max_len, padding='post') 
 # 확인
 print(x[0])
-# [   0    0    0    0   19 1261   23  374    1    5  477  627   19 1261 7   11    7   59]
+# [ 19   5 356  19  11  53   0   0   0   0   0   0   0   0   0   0   0   0]
+
 
 # ------------------------------------------------------------
 # train, test 나누기
@@ -198,7 +207,8 @@ from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 # 임베딩 벡터 차원 100으로 정하고 lstm 이용
 model = Sequential()
 model.add(Embedding(vocab_size, input_length=18, output_dim=100))
-model.add(LSTM(128))
+# model.add(LSTM(128))
+model.add(Conv1D(filters=128, kernel_size=2, activation='relu'))
 model.add(Flatten())
 model.add(Dense(1, activation='sigmoid'))
 model.summary()
@@ -210,11 +220,7 @@ mc = ModelCheckpoint(filepath= file_path, monitor='val_acc', mode = 'max', save_
 
 # 컴파일, 훈련
 model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['acc'])
-
-# from sklearn.metrics import f1_score
-# model.compile(optimizer='rmsprop', loss='f1_score', metrics=['acc'])
-
-# history = model.fit(x_train, y_train, epochs=15, batch_size=32, validation_split=0.2, callbacks=[stop, mc])
+history = model.fit(x_train, y_train, epochs=15, batch_size=32, validation_split=0.2, callbacks=[stop, mc])
 
 # ------------------------------------------------------------
 # 정확도가 가장 높은 가중치 가져와서 적용
@@ -234,7 +240,7 @@ def do_predict(new_sentence):
     new_sentence = komo.morphs(new_sentence)  # 토큰화
     new_sentence = [word for word in new_sentence if not word in stopword] # 불용어 제거
     encoded = tokenizer.texts_to_sequences([new_sentence])  # 정수 인코딩
-    pad_new = pad_sequences(encoded, maxlen = max_len, padding='pre')  # 패딩
+    pad_new = pad_sequences(encoded, maxlen = max_len, padding='post')  # 패딩
 
     # 예측
     score = float(loaded_model.predict(pad_new))
@@ -264,15 +270,13 @@ def do_predict(new_sentence):
 # loss: 0.0504
 # acc: 0.9868
 
-# project_012.h5    # padding pre, conv1d
+# project_012   # 패딩 post > conv1d
+# loss: 0.0404
+# acc: 0.9868   > 큰차이x
 
-
-
-# project_013.h5    # padding post, conv1d
-
-
-# project_014.h5    # f1_score
-
+# project_013   # 패딩 pre > conv1d
+# loss: 0.0416
+# acc: 0.9851   > 큰차이x
 
 
 
